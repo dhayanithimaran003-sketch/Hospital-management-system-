@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Meridian Hospital Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef3f2;--surface:#fff;--ink:#10303a;--muted:#5d7780;--line:#d3e0de;--brand:#0f6b6e;--brand-ink:#fff;--soft:#dcefed;--warn:#b4570a;--warnbg:#fdebd3;--bad:#b3261e;--badbg:#fbdedb;--ok:#1b6b3a;--okbg:#d9f0e0;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0c1a1e;--surface:#142a30;--ink:#e3f0ee;--muted:#8fabb0;--line:#26424a;--brand:#4fc3c0;--brand-ink:#06282a;--soft:#1b3a40;--warn:#f0b36a;--warnbg:#3a2a12;--bad:#f2a49e;--badbg:#401a17;--ok:#8fd8a8;--okbg:#17321f}}
+:root[data-theme="dark"]{--bg:#0c1a1e;--surface:#142a30;--ink:#e3f0ee;--muted:#8fabb0;--line:#26424a;--brand:#4fc3c0;--brand-ink:#06282a;--soft:#1b3a40;--warn:#f0b36a;--warnbg:#3a2a12;--bad:#f2a49e;--badbg:#401a17;--ok:#8fd8a8;--okbg:#17321f}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 "Public Sans",system-ui,sans-serif}
+h1,h2,h3{font-family:"Bricolage Grotesque","Public Sans",sans-serif;margin:0;letter-spacing:-.01em}
+header{background:var(--brand);color:var(--brand-ink);padding:18px 20px 0}
+.top{max-width:1080px;margin:0 auto}
+.top h1{font-size:24px}
+.top p{margin:2px 0 14px;opacity:.85;font-size:14px}
+nav{display:flex;gap:4px;overflow-x:auto}
+nav button{background:transparent;border:0;color:var(--brand-ink);opacity:.75;font:600 14px "Public Sans",sans-serif;padding:10px 16px;border-radius:8px 8px 0 0;cursor:pointer;white-space:nowrap}
+nav button.on{background:var(--bg);color:var(--ink);opacity:1}
+nav button:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+main{max-width:1080px;margin:0 auto;padding:20px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.stat b{display:block;font:700 26px "Bricolage Grotesque",sans-serif}
+.stat span{color:var(--muted);font-size:13px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:16px}
+.panel h2{font-size:18px;margin-bottom:12px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted);flex:1 1 150px}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%}
+.btn{background:var(--brand);color:var(--brand-ink);border:0;border-radius:8px;padding:9px 16px;font:600 14px "Public Sans",sans-serif;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--brand);border:1px solid var(--line);padding:5px 10px;font-size:13px}
+.btn.del{color:var(--bad)}
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:560px}
+th{text-align:left;color:var(--muted);font-weight:500;font-size:13px;padding:8px;border-bottom:1px solid var(--line)}
+td{padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+.tag{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.t-ok{background:var(--okbg);color:var(--ok)}.t-warn{background:var(--warnbg);color:var(--warn)}.t-bad{background:var(--badbg);color:var(--bad)}
+.days{display:flex;gap:4px;flex-wrap:wrap}
+.day{width:30px;text-align:center;padding:2px 0;border-radius:6px;font-size:12px;background:var(--bg);color:var(--muted)}
+.day.on{background:var(--soft);color:var(--brand);font-weight:600}
+.msg{margin:10px 0 0;font-size:14px;color:var(--bad);min-height:20px}
+.empty{color:var(--muted);padding:14px 0}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.sub{color:var(--muted);font-size:13px}
+.right{text-align:right}
+@media (prefers-reduced-motion:no-preference){nav button{transition:background .15s}}
+</style>
+</head>
+<body>
+<header><div class="top">
+<h1>Meridian Hospital</h1>
+<p>Patients, appointments, doctor schedules and billing in one place</p>
+<nav id="nav"></nav>
+</div></header>
+<main id="app"></main>
+
+<script>
+const DN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const KEY='meridian-hms-v1';
+const today=()=>{const d=new Date();return new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,10)};
+const seed=()=>({
+ patients:[{id:1,name:'Anita Raman',age:42,phone:'98400 11223',notes:'Hypertension, on amlodipine. Penicillin allergy.'},{id:2,name:'Karthik Subbu',age:8,phone:'98410 55667',notes:'Recurrent tonsillitis.'},{id:3,name:'Meera Joseph',age:67,phone:'98940 33445',notes:'Type 2 diabetes. HbA1c review due.'}],
+ doctors:[{id:1,name:'Dr. Priya Nair',dept:'Cardiology',days:[1,2,3,4,5],from:9,to:15},{id:2,name:'Dr. Arjun Menon',dept:'Pediatrics',days:[1,3,5,6],from:10,to:16},{id:3,name:'Dr. Salma Khan',dept:'Endocrinology',days:[2,4,6],from:9,to:13}],
+ appts:[{id:1,pid:1,did:1,date:today(),time:'10:00',status:'Scheduled'},{id:2,pid:3,did:3,date:today(),time:'09:30',status:'Scheduled'}],
+ bills:[{id:1,pid:1,desc:'Consultation',amt:800,paid:true},{id:2,pid:3,desc:'HbA1c and lipid panel',amt:1450,paid:false}],
+ next:{p:4,d:4,a:3,b:3}
+});
+let S;
+try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){S=null}
+if(!S||!S.patients)S=seed();
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const inr=n=>'₹'+Number(n).toLocaleString('en-IN');
+const P=id=>S.patients.find(p=>p.id==id),D=id=>S.doctors.find(d=>d.id==id);
+const dow=ds=>new Date(ds+'T00:00:00').getDay();
+const slots=d=>{const o=[];if(!d)return o;for(let h=d.from;h<d.to;h++){o.push(String(h).padStart(2,'0')+':00');o.push(String(h).padStart(2,'0')+':30')}return o};
+const owed=pid=>S.bills.filter(b=>b.pid==pid&&!b.paid).reduce((a,b)=>a+b.amt,0);
+let tab='Patients',q='',msg='';
+const tabs=['Patients','Appointments','Doctors','Billing'];
+
+function stats(){
+ const t=today();
+ const cells=[[S.patients.length,'Patients on record'],[S.appts.filter(a=>a.date==t&&a.status=='Scheduled').length,'Appointments today'],[S.doctors.length,'Doctors'],[inr(S.bills.filter(b=>!b.paid).reduce((a,b)=>a+b.amt,0)),'Unpaid bills']];
+ return '<div class="stats">'+cells.map(c=>`<div class="stat"><b>${c[0]}</b><span>${c[1]}</span></div>`).join('')+'</div>';
+}
+const opts=(arr,f)=>arr.map(f).join('');
+const pOpts=()=>opts(S.patients,p=>`<option value="${p.id}">${esc(p.name)}</option>`);
+
+function vPatients(){
+ const list=S.patients.filter(p=>(p.name+p.phone+p.notes).toLowerCase().includes(q.toLowerCase()));
+ return `<div class="panel"><h2>Register a patient</h2><div class="row">
+ <label>Full name<input id="pn"></label><label style="flex:0 1 90px">Age<input id="pa" type="number" min="0" max="120"></label>
+ <label>Phone<input id="pp"></label><label style="flex:2 1 240px">Clinical notes<input id="pt"></label>
+ <button class="btn" onclick="addPatient()">Add patient</button></div><div class="msg">${msg}</div></div>
+ <div class="panel"><div class="row" style="justify-content:space-between;margin-bottom:8px"><h2>Patient records</h2>
+ <label style="max-width:260px;flex:0 1 260px">Search<input id="sq" value="${esc(q)}" oninput="q=this.value;go(true)"></label></div>
+ <div class="tbl">${list.length?`<table><tr><th>Name</th><th>Age</th><th>Phone</th><th>Notes</th><th>Visits</th><th>Balance due</th><th></th></tr>`+
+ list.map(p=>`<tr><td><b>${esc(p.name)}</b></td><td>${esc(p.age)}</td><td>${esc(p.phone)}</td><td>${esc(p.notes)}</td><td>${S.appts.filter(a=>a.pid==p.id&&a.status=='Done').length}</td><td>${owed(p.id)?inr(owed(p.id)):'—'}</td><td><button class="btn ghost del" onclick="delPatient(${p.id})">Remove</button></td></tr>`).join('')+'</table>':'<div class="empty">No patients match. Add one above.</div>'}</div></div>`;
+}
+function vAppts(){
+ const d0=S.doctors[0];
+ const list=[...S.appts].sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+ const st={Scheduled:'t-warn',Done:'t-ok',Cancelled:'t-bad'};
+ return `<div class="panel"><h2>Book an appointment</h2><div class="row">
+ <label>Patient<select id="ap">${pOpts()}</select></label>
+ <label>Doctor<select id="ad" onchange="fillSlots()">${opts(S.doctors,d=>`<option value="${d.id}">${esc(d.name)} (${esc(d.dept)})</option>`)}</select></label>
+ <label>Date<input id="adt" type="date" value="${today()}" min="${today()}"></label>
+ <label>Time<select id="at">${opts(slots(d0),s=>`<option>${s}</option>`)}</select></label>
+ <button class="btn" onclick="book()">Book</button></div><div class="msg">${msg}</div></div>
+ <div class="panel"><h2>All appointments</h2><div class="tbl">${list.length?`<table><tr><th>Date</th><th>Time</th><th>Patient</th><th>Doctor</th><th>Status</th><th></th></tr>`+
+ list.map(a=>`<tr><td>${a.date}</td><td>${a.time}</td><td>${esc(P(a.pid)?.name||'Removed')}</td><td>${esc(D(a.did)?.name||'')}</td><td><span class="tag ${st[a.status]}">${a.status}</span></td><td class="right">${a.status=='Scheduled'?`<button class="btn ghost" onclick="setAppt(${a.id},'Done')">Complete</button> <button class="btn ghost del" onclick="setAppt(${a.id},'Cancelled')">Cancel</button>`:''}</td></tr>`).join('')+'</table>':'<div class="empty">No appointments yet. Book the first one above.</div>'}</div></div>`;
+}
+function vDoctors(){
+ const t=today();
+ return `<div class="panel"><h2>Add a doctor</h2><div class="row">
+ <label>Name<input id="dn"></label><label>Department<input id="dd"></label>
+ <label style="flex:0 1 100px">From (hour)<input id="df" type="number" min="0" max="23" value="9"></label>
+ <label style="flex:0 1 100px">To (hour)<input id="dt" type="number" min="1" max="24" value="17"></label>
+ <label style="flex:1 1 230px">Working days<div class="days" id="dw">${DN.map((n,i)=>`<label class="day" style="flex:none;cursor:pointer;padding:0"><input type="checkbox" value="${i}" ${i>0&&i<6?'checked':''} style="display:none" onchange="this.parentNode.classList.toggle('on',this.checked)"><span style="display:block;padding:4px 0">${n}</span></label>`).join('')}</div></label>
+ <button class="btn" onclick="addDoctor()">Add doctor</button></div><div class="msg">${msg}</div></div>
+ <div class="cards">${S.doctors.map(d=>{
+  const up=S.appts.filter(a=>a.did==d.id&&a.status=='Scheduled'&&a.date>=t).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+  return `<div class="panel" style="margin:0"><h3>${esc(d.name)}</h3><div class="sub">${esc(d.dept)} · ${String(d.from).padStart(2,'0')}:00–${String(d.to).padStart(2,'0')}:00</div>
+  <div class="days" style="margin:10px 0">${DN.map((n,i)=>`<span class="day ${d.days.includes(i)?'on':''}">${n}</span>`).join('')}</div>
+  <div class="sub" style="margin-bottom:4px">Upcoming (${up.length})</div>${up.length?up.slice(0,5).map(a=>`<div>${a.date} ${a.time} · ${esc(P(a.pid)?.name||'Removed')}</div>`).join(''):'<div class="sub">No upcoming bookings</div>'}
+  <div style="margin-top:10px"><button class="btn ghost del" onclick="delDoctor(${d.id})">Remove</button></div></div>`}).join('')}</div>`;
+}
+function vBilling(){
+ const total=S.bills.reduce((a,b)=>a+b.amt,0),paid=S.bills.filter(b=>b.paid).reduce((a,b)=>a+b.amt,0);
+ return `<div class="panel"><h2>Create a bill</h2><div class="row">
+ <label>Patient<select id="bp">${pOpts()}</select></label><label style="flex:2 1 220px">Description<input id="bd" placeholder="e.g. X-ray, room charges"></label>
+ <label style="flex:0 1 130px">Amount (₹)<input id="ba" type="number" min="0"></label>
+ <button class="btn" onclick="addBill()">Create bill</button></div><div class="msg">${msg}</div></div>
+ <div class="panel"><h2>Bills</h2><div class="sub" style="margin-bottom:8px">Billed ${inr(total)} · Collected ${inr(paid)} · Outstanding ${inr(total-paid)}</div>
+ <div class="tbl">${S.bills.length?`<table><tr><th>Patient</th><th>Description</th><th>Amount</th><th>Status</th><th></th></tr>`+
+ [...S.bills].reverse().map(b=>`<tr><td>${esc(P(b.pid)?.name||'Removed')}</td><td>${esc(b.desc)}</td><td>${inr(b.amt)}</td><td><span class="tag ${b.paid?'t-ok':'t-warn'}">${b.paid?'Paid':'Unpaid'}</span></td><td class="right">${b.paid?'':`<button class="btn ghost" onclick="pay(${b.id})">Mark paid</button> `}<button class="btn ghost del" onclick="delBill(${b.id})">Delete</button></td></tr>`).join('')+'</table>':'<div class="empty">No bills yet. Create one above.</div>'}</div></div>`;
+}
+function go(keepFocus){
+ document.getElementById('nav').innerHTML=tabs.map(t=>`<button class="${t==tab?'on':''}" onclick="tab='${t}';q='';msg='';go()">${t}</button>`).join('');
+ const v={Patients:vPatients,Appointments:vAppts,Doctors:vDoctors,Billing:vBilling}[tab];
+ document.getElementById('app').innerHTML=stats()+v();
+ if(keepFocus){const e=document.getElementById('sq');if(e){e.focus();e.setSelectionRange(q.length,q.length)}}
+}
+const val=id=>document.getElementById(id).value.trim();
+const fail=m=>{msg=esc(m);go()};
+function addPatient(){const n=val('pn');if(!n)return fail('Enter the patient\u2019s name.');
+ S.patients.push({id:S.next.p++,name:n,age:val('pa')||'—',phone:val('pp')||'—',notes:val('pt')||'—'});msg='';save();go()}
+function delPatient(id){if(!confirm('Remove this patient and their appointments and bills?'))return;
+ S.patients=S.patients.filter(p=>p.id!=id);S.appts=S.appts.filter(a=>a.pid!=id);S.bills=S.bills.filter(b=>b.pid!=id);save();go()}
+function fillSlots(){const d=D(document.getElementById('ad').value);document.getElementById('at').innerHTML=opts(slots(d),s=>`<option>${s}</option>`)}
+function book(){
+ if(!S.patients.length)return fail('Register a patient first.');
+ if(!S.doctors.length)return fail('Add a doctor first.');
+ const pid=+val('ap'),did=+val('ad'),date=val('adt'),time=val('at'),d=D(did);
+ if(!date)return fail('Choose a date.');
+ if(!d.days.includes(dow(date)))return fail(`${d.name} does not work on ${DN[dow(date)]}. Pick one of: ${d.days.map(i=>DN[i]).join(', ')}.`);
+ if(S.appts.some(a=>a.did==did&&a.date==date&&a.time==time&&a.status!='Cancelled'))return fail('That slot is already booked. Choose another time.');
+ S.appts.push({id:S.next.a++,pid,did,date,time,status:'Scheduled'});msg='';save();go()}
+function setAppt(id,s){S.appts.find(a=>a.id==id).status=s;save();go()}
+function addDoctor(){
+ const n=val('dn'),dept=val('dd'),f=+val('df'),t=+val('dt');
+ const days=[...document.querySelectorAll('#dw input:checked')].map(i=>+i.value);
+ if(!n||!dept)return fail('Enter the doctor\u2019s name and department.');
+ if(!days.length)return fail('Select at least one working day.');
+ if(!(f<t))return fail('The end hour must be after the start hour.');
+ S.doctors.push({id:S.next.d++,name:n,dept,days,from:f,to:t});msg='';save();go()}
+function delDoctor(id){if(!confirm('Remove this doctor and cancel their appointments?'))return;
+ S.doctors=S.doctors.filter(d=>d.id!=id);S.appts=S.appts.filter(a=>a.did!=id);save();go()}
+function addBill(){
+ if(!S.patients.length)return fail('Register a patient first.');
+ const desc=val('bd'),amt=+val('ba');
+ if(!desc||!(amt>0))return fail('Enter a description and an amount above zero.');
+ S.bills.push({id:S.next.b++,pid:+val('bp'),desc,amt,paid:false});msg='';save();go()}
+function pay(id){S.bills.find(b=>b.id==id).paid=true;save();go()}
+function delBill(id){S.bills=S.bills.filter(b=>b.id!=id);save();go()}
+go();
+</script>
+</body>
+</html>
